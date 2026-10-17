@@ -1,0 +1,198 @@
+/* player.css — the shell every presentation shares: the fitted frame, the type machinery, the start, end and
+   credits screens, the console, and the console again for small screens. Kit code: a show does not edit this.
+   Colours and faces come from the show's tokens in show.css:
+     --ink --cream --gold --panel --night   (dark text, light text, accent, console, end-card background)
+     --display --text                       (the face that speaks, the face that labels) */
+:root{--page:#0B0806;--night:#0E0A07;--panel:#14100C;--panel-2:#2B2118;--panel-3:#231A12;--panel-line:#4A3C2D;--panel-line-2:#6B573E;--muted:#BFB29C;--voice-2:#CFE6EC;--ink-2:#3A2A1C;--edge:rgba(245,238,220,.45)}      /* defaults; a show overrides any of them in show.css */
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--page);overflow:hidden}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}      /* phones must not re-size the type on their own */
+body{font-family:var(--text);color:var(--cream);-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit}
+#fit{position:fixed;left:0;top:0;width:100vw;height:100vh;height:100dvh;background:var(--page);overflow:hidden}
+#frame{position:absolute;left:0;top:0;transform-origin:0 0;overflow:hidden;visibility:hidden}
+#stage{position:absolute;left:0;top:0;width:1920px;height:960px;transform-origin:0 0}
+.ready #frame{visibility:visible}
+#world{position:absolute;left:0;top:0;display:block}
+#hud{position:absolute;left:0;top:0;width:1920px;height:960px}
+#grain{position:absolute;left:0;top:0;width:100%;pointer-events:none}
+#grain{opacity:.11;mix-blend-mode:multiply;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .6 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+
+/* ---------- type on the stage: the machinery (the faces and sizes are the show's, in show.css) ---------- */
+.h{position:absolute;visibility:hidden;white-space:nowrap;will-change:transform,opacity}
+.h.wrap{white-space:normal}
+/* blocks: placed by hand; the lines inside are in normal flow and so cannot overlap each other */
+.blk{position:absolute;display:flex;flex-direction:column;align-items:flex-start}
+.blk .h{position:relative;max-width:none}
+.blk .h.wrap{max-width:100%}
+.pair{display:flex;align-items:flex-start}
+.pair>.col{display:flex;flex-direction:column;align-items:flex-start;flex:none}
+.line{display:flex;align-items:center}
+.measuring #frame,.measuring #stage{transform:none !important}
+.measuring .h{visibility:visible !important;transform:none !important;opacity:1 !important;filter:none !important;clip-path:none !important}
+.measuring .w{transform:none !important;opacity:1 !important}
+.fit-lt{transform-origin:0 0}.fit-rt{transform-origin:100% 0}.fit-lb{transform-origin:0 100%}.fit-rb{transform-origin:100% 100%}
+.w{display:inline-block;will-change:transform,opacity}
+
+/* ---------- start, end, credits ----------
+   These sit over the picture at window level. Their sizes follow --k, the picture's scale, which is never allowed
+   to fall below what can be read and tapped. scenes.js measures each one on the viewer's screen and, where the
+   designed arrangement would not fit, takes the next one down: the start button closes up or becomes a card on the
+   rock; the end card closes up, drops its portrait, or stacks. If nothing fits, they scroll from the top. */
+#overlays{position:absolute;left:0;top:0;width:100%;pointer-events:none;--k:1}
+#overlays>*{pointer-events:auto}
+#poster{position:absolute;visibility:hidden;color:var(--ink);max-width:calc(100% - 20px)}
+.idle-start.ready #poster{visibility:visible}
+#poster button{display:inline-flex;align-items:center;gap:calc(16px*var(--k));font:700 calc(40px*var(--k))/1 var(--display);white-space:nowrap;background:var(--ink);color:var(--cream);border:0;border-radius:999px;padding:calc(24px*var(--k)) calc(44px*var(--k)) calc(26px*var(--k)) calc(34px*var(--k));cursor:pointer}
+#poster button:hover{background:var(--ink-2)}
+#poster svg{flex:none;width:calc(34px*var(--k));height:calc(34px*var(--k));fill:var(--gold)}
+#poster p{font:500 max(13px,calc(30px*var(--k)))/1.3 var(--text);margin:calc(22px*var(--k)) 0 0 calc(6px*var(--k))}
+#poster .keys{font-size:max(12px,calc(24px*var(--k)));opacity:.72;margin-top:calc(6px*var(--k))}
+#poster .turn{display:none;font-size:12px;opacity:.72;margin-top:4px}
+.touch #poster .keys{display:none}
+.narrow #poster .turn{display:block}
+.postcard #poster{background:var(--cream);border-radius:14px;padding:14px 16px 13px;box-shadow:0 12px 34px rgba(20,12,6,.4)}
+.postcard #poster p{margin-left:3px}
+.postbare #poster p,.postbare #poster .turn{display:none}
+#poster .short,.postshort #poster .long{display:none}
+.postshort #poster .short{display:inline}
+.postbare.idle-start #cap:empty::before{content:attr(data-idle);opacity:.72}   /* the button stands alone; its small print goes where the captions will be */
+
+#endcard{position:absolute;left:0;top:0;width:100%;height:100%;background:var(--night);display:flex;visibility:hidden;overflow:auto;overscroll-behavior:contain;--e:var(--k);
+  padding:calc(30px*var(--e)) max(calc(110px*var(--e)),env(safe-area-inset-right)) calc(30px*var(--e)) max(calc(110px*var(--e)),env(safe-area-inset-left))}
+.show-end #endcard{visibility:visible}
+.end-inner{margin:auto;display:grid;grid-template-columns:auto minmax(0,auto);grid-template-rows:1fr auto auto auto 1fr;grid-template-areas:"fig ." "fig h" "fig p" "fig act" "fig .";column-gap:calc(90px*var(--e))}
+#endcard figure{grid-area:fig;align-self:center;margin:0;width:calc(400px*var(--e))}
+#endcard figure>:first-child{display:block;width:100%;height:auto;aspect-ratio:4/5;object-fit:cover;border-radius:6px}
+#endcard figcaption{font:500 max(11px,calc(20px*var(--e)))/1.3 var(--text);opacity:.62;margin-top:calc(12px*var(--e))}
+#endcard h2{grid-area:h;font:900 min(calc(150px*var(--e)),calc((100vw - 710px*var(--e))/7))/1 var(--display);letter-spacing:-.02em;white-space:nowrap;color:var(--gold);margin:0 0 calc(22px*var(--e))}
+#endcard p{grid-area:p;font:italic 500 max(16px,calc(44px*var(--e)))/1.3 var(--display);margin:0 0 calc(44px*var(--e));max-width:calc(1040px*var(--e))}
+.end-actions{grid-area:act;display:flex;flex-wrap:wrap;gap:max(10px,calc(16px*var(--e)))}
+.end-actions a,.end-actions button{font:600 max(15px,calc(28px*var(--e)))/1 var(--text);white-space:nowrap;text-decoration:none;color:var(--cream);border:2px solid var(--edge);background:none;border-radius:999px;padding:max(11px,calc(18px*var(--e))) max(17px,calc(30px*var(--e))) max(12px,calc(20px*var(--e)));cursor:pointer}
+.end-actions button#again{background:var(--gold);border-color:var(--gold);color:var(--ink)}
+.end-actions a:hover,.end-actions button:hover{border-color:var(--cream)}
+.end-actions .quiet{border-color:transparent;opacity:.75;text-decoration:underline;text-underline-offset:6px}
+/* a short, wide screen (a phone on its side): no portrait, the words beside the buttons */
+.end-short #endcard{padding:10px max(24px,env(safe-area-inset-right)) 10px max(24px,env(safe-area-inset-left))}
+.end-short .end-inner{grid-template-columns:minmax(0,1fr) auto;grid-template-rows:1fr auto auto 1fr;grid-template-areas:". act" "h act" "p act" ". act";column-gap:28px;width:100%;max-width:880px}
+.end-short #endcard figure{display:none}
+.end-short #endcard h2{font-size:min(48px,calc((100vw - 340px)/7));margin-bottom:8px}
+.end-short #endcard p{font-size:16px;margin:0;max-width:none}
+.end-short .end-actions{align-self:center;flex-direction:column;flex-wrap:nowrap;align-items:stretch;gap:8px}
+.end-short .end-actions a,.end-short .end-actions button{font-size:14px;padding:10px 16px 11px;text-align:center}
+/* a narrow, upright screen: one column */
+.narrow #endcard{padding:16px 22px}
+.narrow .end-inner{grid-template-columns:minmax(0,1fr);grid-template-rows:none;grid-template-areas:"fig" "h" "p" "act";width:100%}
+.narrow #endcard figure{align-self:start;width:auto;margin-bottom:16px}
+.narrow #endcard figure>:first-child{width:min(30vw,150px)}
+.narrow #endcard h2{font-size:min(12vw,64px);margin-bottom:10px}
+.narrow #endcard p{font-size:17px;margin-bottom:18px;max-width:none}
+/* ...and when that is too tall for the screen: the portrait moves up beside the heading and the buttons close up */
+.narrow.end-tight .end-inner{grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"h fig" "p p" "act act";column-gap:12px}
+.narrow.end-tight #endcard figure{align-self:end;margin-bottom:12px}
+.narrow.end-tight #endcard figure>:first-child{width:64px}
+.narrow.end-tight #endcard figcaption{display:none}
+.narrow.end-tight #endcard h2{align-self:end;font-size:calc((100vw - 124px)/7);margin-bottom:12px}
+.narrow.end-tight #endcard p{font-size:16px;margin-bottom:14px}
+.narrow.end-tight #open-credits{order:1}
+.narrow.end-tight .end-actions a{order:2}
+
+#credits{position:absolute;left:0;top:0;width:100%;height:100%;background:var(--night);display:flex;overflow:auto;overscroll-behavior:contain;--p:max(16px,calc(30px*var(--k)));
+  padding:var(--p) max(var(--p),env(safe-area-inset-right)) 0 max(var(--p),env(safe-area-inset-left))}
+#credits[hidden]{display:none}
+.credits-inner{width:calc(1320px*var(--k));max-width:100%;margin:auto}
+.narrow .credits-inner{margin:0 auto auto}
+.credits-inner h2{font:700 max(24px,calc(64px*var(--k)))/1 var(--display);margin:0 0 max(14px,calc(30px*var(--k)));color:var(--gold)}
+.credits-inner p{font:500 max(14px,calc(26px*var(--k)))/1.45 var(--text);margin:0 0 max(10px,calc(18px*var(--k)))}
+.credits-inner a{color:var(--gold)}
+.credits-foot{position:sticky;bottom:0;padding:max(24px,calc(30px*var(--k))) 0 var(--p);background:linear-gradient(rgba(0,0,0,0),var(--night) 22px)}   /* Close stays in reach while the text scrolls */
+.credits-foot button{display:block;font:600 max(15px,calc(26px*var(--k)))/1 var(--text);background:var(--gold);color:var(--ink);border:0;border-radius:999px;padding:max(11px,calc(16px*var(--k))) max(18px,calc(30px*var(--k))) max(12px,calc(18px*var(--k)));cursor:pointer}
+
+/* ---------- the console ---------- */
+#console{position:absolute;left:0;top:0;width:1920px;height:120px;transform-origin:0 0}
+#console-bg{position:absolute;left:0;width:100%;background:var(--panel)}
+#bar{position:absolute;left:0;top:0;width:100%;height:10px;background:var(--panel-2);cursor:pointer}
+#bar::before{content:"";position:absolute;left:0;right:0;top:-16px;bottom:-12px}
+#bar-fill{position:absolute;left:0;top:0;height:100%;width:0;background:var(--gold)}
+#bar-fill,#bar-ticks,#bar-tip{pointer-events:none}
+#bar-ticks i{position:absolute;top:0;width:4px;height:10px;margin-left:-2px;background:var(--panel)}
+#bar-tip{position:absolute;bottom:24px;transform:translateX(-50%);background:var(--cream);color:var(--ink);font:600 23px/1 var(--text);padding:10px 16px 11px;border-radius:6px;white-space:nowrap;display:none;pointer-events:none}
+#btn-play{position:absolute;left:34px;top:32px;width:66px;height:66px;border-radius:50%;border:2px solid var(--panel-line);background:none;cursor:pointer;display:grid;place-items:center}
+#btn-play:hover{border-color:var(--gold)}
+#btn-play svg{width:30px;height:30px;fill:var(--cream);grid-area:1/1}
+.i-pause{display:none}.playing .i-play{display:none}.playing .i-pause{display:block}
+#chap{position:absolute;left:120px;top:30px;width:336px;text-align:left;background:none;border:0;cursor:pointer;padding:4px 8px;border-radius:6px}
+#chap:hover{background:var(--panel-3)}
+#chap-n{display:block;font:500 20px/1.2 var(--text);opacity:.6}
+#chap-t{display:block;font:700 31px/1.2 var(--display);white-space:nowrap}
+#cap{position:absolute;left:470px;top:18px;width:880px;height:98px;display:flex;align-items:center;justify-content:center;text-align:center;font:500 31px/1.26 var(--text)}
+#cap div{max-width:100%;text-wrap:balance}
+#cap span{opacity:.42}
+#cap span.said{opacity:1}
+#cap.m{color:var(--voice-2)}
+.no-cc #cap{visibility:hidden}
+#odo{position:absolute;left:1366px;top:26px;width:150px;text-align:center}
+.odo-digits{display:inline-flex;gap:4px;height:52px}
+.odo-digits span{display:block;width:30px;height:52px;background:var(--panel-3);border-radius:4px;overflow:hidden}
+.odo-digits b{display:block;font:800 36px/52px var(--display);color:var(--cream);white-space:pre;text-align:center;will-change:transform}
+#odo small{display:block;font:500 18px/1 var(--text);opacity:.55;margin-top:6px}
+#tools{position:absolute;left:1530px;top:24px;width:372px;display:flex;flex-wrap:wrap;gap:8px 8px;align-items:center}
+#time{font:500 21px/1 var(--text);font-variant-numeric:tabular-nums;opacity:.75;width:150px}
+#tools button{font:600 19px/1 var(--text);background:none;border:1.5px solid var(--panel-line);border-radius:6px;padding:8px 11px 9px;cursor:pointer;color:var(--muted)}
+#tools button:hover{border-color:var(--gold);color:var(--cream)}
+#tools button.on{background:var(--panel-2);border-color:var(--panel-line-2);color:var(--cream)}
+button:focus-visible,#bar:focus-visible,a:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
+#chaplist{position:absolute;left:112px;bottom:128px;width:520px;background:var(--panel);border:1.5px solid var(--panel-line);border-radius:10px;padding:10px;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+#chaplist[hidden]{display:none}
+#chaplist button{display:flex;width:100%;gap:16px;align-items:baseline;text-align:left;background:none;border:0;border-radius:6px;padding:10px 14px;cursor:pointer;font:700 27px/1.2 var(--display)}
+#chaplist button:hover,#chaplist button.cur{background:var(--panel-2)}
+#chaplist button i{font:500 20px/1 var(--text);font-style:normal;opacity:.55;width:54px}
+#chaplist button em{font:500 20px/1 var(--text);font-style:normal;opacity:.55;margin-left:auto}
+#toast{position:absolute;left:50%;bottom:136px;transform:translateX(-50%);background:var(--cream);color:var(--ink);font:600 25px/1.2 var(--text);padding:14px 24px 16px;border-radius:8px;white-space:nowrap;display:none}
+#toast.show{display:block}
+.playing.idle{cursor:none}
+.playing.idle #tools,.playing.idle #btn-play,.playing.idle #chap-n{opacity:.3}
+
+/* ---------- the console on a small screen ----------
+   Below half size the designed console would be too small to read or touch, so it is laid out again in real pixels:
+   captions that can be read, buttons that can be hit. On an upright screen it stacks. On a tablet it is drawn a little larger
+   (scenes.js sets its width and scale). It keeps clear of a phone's notch and home bar. */
+.compact #console-bg{display:none}
+.compact #console{--pl:max(12px,env(safe-area-inset-left));--pr:max(12px,env(safe-area-inset-right));left:0;width:100%;height:auto;display:grid;grid-template-columns:auto minmax(0,1.25fr) minmax(0,2fr) auto;grid-template-areas:"bar bar bar bar" "play chap cap tools";align-items:center;column-gap:10px;padding:0 var(--pr) max(8px,env(safe-area-inset-bottom)) var(--pl);background:var(--panel)}
+.compact.stack #console{grid-template-columns:auto minmax(0,1fr);grid-template-areas:"bar bar" "cap cap" "play chap" "tools tools";row-gap:6px;padding-bottom:max(10px,env(safe-area-inset-bottom))}
+.compact #bar{position:relative;grid-area:bar;width:auto;height:5px;margin:0 calc(-1*var(--pr)) 8px calc(-1*var(--pl))}
+.compact #bar::before{top:-14px;bottom:-14px}
+.compact #bar-ticks i{height:5px;width:2px;margin-left:-1px}
+.compact #bar-tip{bottom:14px;font-size:13px;padding:6px 9px 7px}
+.compact #btn-play{position:static;grid-area:play;width:44px;height:44px}
+.compact #btn-play svg{width:20px;height:20px}
+.compact #chap{position:static;grid-area:chap;width:auto;min-width:0;min-height:38px;padding:3px 6px}
+.compact #chap-n{font-size:12px}
+.compact #chap-t{font-size:17px;overflow:hidden;text-overflow:ellipsis}
+.compact #cap{position:static;grid-area:cap;width:auto;height:44px;font:500 16px/1.3 var(--text);padding:0 4px}
+.compact #odo{display:none}
+.compact #tools{position:static;grid-area:tools;width:auto;gap:6px;flex-wrap:nowrap;justify-content:flex-end}
+.compact.stack #tools{justify-content:space-between}
+.compact #time{font-size:13px;width:auto;margin-right:2px;white-space:nowrap}
+.compact #tools button{font-size:13px;padding:9px 9px 10px;min-height:36px;min-width:30px;white-space:nowrap}
+.compact #chaplist{left:max(8px,env(safe-area-inset-left));bottom:calc(100% + 8px);width:min(420px,calc((100vw - 16px)/var(--c,1)));max-height:calc((var(--ah,100vh) - 16px)/var(--c,1));overflow:auto;overscroll-behavior:contain}
+.compact #chaplist button{font-size:17px;padding:8px 10px;gap:10px}
+.compact #chaplist button i{font-size:13px;width:14px;flex:none;text-align:center}
+.compact #chaplist button em{font-size:13px;width:auto}
+.compact.short #chaplist:not([hidden]){display:grid;grid-template-columns:1fr 1fr;grid-template-rows:repeat(5,auto);grid-auto-flow:column;column-gap:6px;width:min(620px,calc((100vw - 16px)/var(--c,1)))}   /* a phone on its side: two columns, so all nine fit */
+.compact.short #chaplist button{padding:6px 10px}
+.compact #toast{bottom:calc(100% + 10px);font-size:14px;padding:9px 14px 10px;white-space:normal;width:max-content;max-width:calc(92vw/var(--c,1));text-align:center}
+.c-notime #time{display:none}      /* leave the room to the captions */
+.c-snug #console{grid-template-columns:auto minmax(0,.9fr) minmax(0,2.3fr) auto}
+.c-snug #tools{gap:4px}
+.c-snug #tools button{padding:9px 6px 10px}
+.c-snug #chap-n{display:none}      /* a small phone on its side: the chapter title takes two lines instead of being cut */
+.c-snug #chap-t{white-space:normal;font-size:14px;line-height:1.25;max-height:calc(2.5em + 2px)}
+.c-tight #tools{gap:4px}
+.c-tight #tools button{padding:9px 6px 10px}
+.no-readout #odo{display:none}
+/* an end card with no picture: the words take the whole width */
+.no-figure .end-inner{grid-template-columns:minmax(0,auto);grid-template-areas:"." "h" "p" "act" "."}
+.no-figure.end-short .end-inner{grid-template-columns:minmax(0,1fr) auto;grid-template-areas:". act" "h act" "p act" ". act"}
+.no-figure.narrow .end-inner,.no-figure.narrow.end-tight .end-inner{grid-template-columns:minmax(0,1fr);grid-template-areas:"h" "p" "act"}
+.no-figure.narrow.end-tight #endcard h2{font-size:min(12vw,64px)}

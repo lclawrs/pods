@@ -1,0 +1,72 @@
+/* show.css — the look of The Infinite Hotel: a roadside hotel at night. Neon on navy.
+   Two families: Fraunces (soft, slightly wonky) for everything that speaks, Space Grotesk for everything that labels.
+   The whole film is at night, so all type is light. Mostly watched on phones: little type, and large. */
+:root{
+  /* read by the player (player.css): */
+  --ink:#0B0D22;      /* dark type (on cards) */
+  --cream:#F6F0E2;    /* light type, on the night */
+  --gold:#FFD166;     /* the accent: the scrub bar, the end card's heading and first button */
+  --display:Fraunces,Georgia,serif;
+  --text:"Space Grotesk",system-ui,sans-serif;
+  --page:#060714; --night:#090A1E;
+  --panel:#0E1030; --panel-2:#1E2050; --panel-3:#181A44;
+  --panel-line:#34377A; --panel-line-2:#5559A8;
+  --muted:#A9A8D0;
+  --voice-2:#9BE8E0;
+  --ink-2:#FF7A9C;                       /* the start button, hovered */
+  --edge:rgba(246,240,226,.45);
+  /* this show's own: */
+  --pink:#FF4D7E; --teal:#3DE0D0; --paper:#F6F0E2;
+}
+#grain{opacity:.06}
+
+/* ---------- the type scale (sizes are in the 1920×960 frame) ---------- */
+.num{font:900 120px/.9 var(--display);letter-spacing:-.03em}
+.title{font:900 150px/.98 var(--display);letter-spacing:-.03em}
+.big{font:900 132px/1 var(--display);letter-spacing:-.02em}
+.t1{font:700 88px/1.06 var(--display);letter-spacing:-.015em}
+.t2{font:700 58px/1.2 var(--display)}
+.t3{font:italic 500 54px/1.22 var(--display)}
+.b1{font:600 44px/1.3 var(--text)}
+.b2{font:500 32px/1.35 var(--text)}
+.cream{color:var(--cream)}.gold{color:var(--gold)}.pink{color:var(--pink)}.teal{color:var(--teal)}
+.h.cream,.h.gold,.h.pink,.h.teal{text-shadow:0 3px 26px rgba(6,7,20,.75)}
+
+/* ---------- the start button, on a night sky ---------- */
+#poster{color:var(--cream)}
+#poster button{background:var(--pink);color:var(--ink)}
+#poster svg{fill:var(--ink)}
+.postcard #poster{color:var(--ink)}
+
+/* ---------- devices ---------- */
+/* the phrase that comes back, top right */
+.chip{font:700 25px/1 var(--text);letter-spacing:.06em;background:rgba(13,11,38,.9);color:var(--pink);padding:13px 20px 14px;border-radius:999px;border:2px solid rgba(255,77,126,.5)}
+.chip small{font-size:20px;font-weight:500;letter-spacing:0;color:var(--cream);opacity:.75;margin-left:10px}
+#chips{position:absolute;left:0;top:0;width:1920px;height:0}
+.idle-start #chips,.clean #chips{visibility:hidden}
+.idle-start #chips .h,.clean #chips .h{visibility:hidden !important}
+/* a rubber stamp */
+.stamp{font:900 64px/1 var(--display);color:var(--pink);border:8px solid var(--pink);padding:10px 26px 14px;border-radius:12px;--rot:-8deg;background:rgba(246,240,226,.92)}
+/* paper: anything that slides in over the picture */
+.paper{background:var(--paper);border-radius:14px;box-shadow:0 34px 90px rgba(0,0,0,.6);color:var(--ink);white-space:normal}
+.card-body{padding:30px 40px 34px}
+.card-body h3{font:700 46px/1.1 var(--display);margin:0 0 14px}
+/* the guest list: one row a room, one letter a cell */
+.gl{display:flex;align-items:center;height:78px;border-top:2px solid rgba(11,13,34,.12)}
+.gl i{font:700 30px/1 var(--text);font-style:normal;width:150px;opacity:.6}
+.gl b{font:700 54px/66px var(--text);width:88px;height:66px;text-align:center;border-radius:33px}
+.gl b.d.on{background:var(--pink);color:#fff}
+.gl u{font:700 44px/1 var(--text);text-decoration:none;opacity:.4;width:60px;text-align:center}
+.gl.new{border-top:5px solid var(--ink);height:92px}
+.gl.new i{opacity:1;color:#C2185B}
+.gl.new b{opacity:0;color:#C2185B}
+.gl.new b.on{opacity:1}
+/* the review */
+.review{padding:26px 34px 30px}
+.review .stars{font:700 54px/1 var(--text);color:#E0A100;letter-spacing:.08em}
+.review .stars span{color:rgba(11,13,34,.22)}
+.review p{font:italic 500 40px/1.25 var(--display);margin:14px 0 8px}
+.review small{font:600 26px/1 var(--text);opacity:.6}
+
+/* ---------- the end card's picture ---------- */
+#endcard figure>svg{background:#0D0B26}

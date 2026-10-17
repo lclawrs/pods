@@ -1,0 +1,8 @@
+/* Fraunces, Space Grotesk: latin subset, served from this folder so the layout never depends on a font server.
+   Keep each family's licence text beside these files. Paths here are relative to this file, not to the page. */
+@font-face{font-family:'Fraunces';font-style:italic;font-weight:500;font-display:block;src:url(fraunces-italic-367d0e.woff2) format('woff2')}
+@font-face{font-family:'Fraunces';font-style:normal;font-weight:700;font-display:block;src:url(fraunces-normal-32d753.woff2) format('woff2')}
+@font-face{font-family:'Fraunces';font-style:normal;font-weight:900;font-display:block;src:url(fraunces-normal-32d753.woff2) format('woff2')}
+@font-face{font-family:'Space Grotesk';font-style:normal;font-weight:500;font-display:block;src:url(space-grotesk-normal-4ecc7e.woff2) format('woff2')}
+@font-face{font-family:'Space Grotesk';font-style:normal;font-weight:600;font-display:block;src:url(space-grotesk-normal-4ecc7e.woff2) format('woff2')}
+@font-face{font-family:'Space Grotesk';font-style:normal;font-weight:700;font-display:block;src:url(space-grotesk-normal-4ecc7e.woff2) format('woff2')}
